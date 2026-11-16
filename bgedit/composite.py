@@ -81,7 +81,7 @@ if prev:
     enc_cmd += ['-c:v', 'libx264', '-crf', '18', '-preset', 'fast', '-pix_fmt', 'yuv420p', out]
 else:
     enc_cmd += ['-i', video, '-map', '0:v', '-map', '1:a', '-c:a', 'copy', '-c:v', 'libx264', '-crf', '14',
-                '-preset', 'slow', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-shortest', out]
+                '-preset', 'slow', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out]
 enc = subprocess.Popen(enc_cmd, stdin=subprocess.PIPE)
 for i in range(n):
     buf = dec.stdout.read(W * H * 3)
