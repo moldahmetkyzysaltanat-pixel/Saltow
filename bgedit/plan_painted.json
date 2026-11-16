@@ -1,0 +1,11 @@
+{
+ "crossfade": 0.6, "dof": 1.2, "shadow": 0.35,
+ "scenes": [
+  {"start": 0.0,   "end": 6.49,  "image": "/tmp/claude-0/-home-user-Saltow/98068416-2059-5985-bf61-10d3aadf831c/scratchpad/painted/01_steppe.jpg",        "drift": [0.4, 0], "lines": "Кең байтақ далам, туған жер / Жүрегім саған байланған"},
+  {"start": 6.49,  "end": 11.73, "image": "/tmp/claude-0/-home-user-Saltow/98068416-2059-5985-bf61-10d3aadf831c/scratchpad/painted/02_mountains_lake.jpg","drift": [-0.4, 0], "lines": "Асқар тауым… бұлағым / Бәрінен сенсің жайнаған"},
+  {"start": 11.73, "end": 20.74, "image": "/tmp/claude-0/-home-user-Saltow/98068416-2059-5985-bf61-10d3aadf831c/scratchpad/painted/03_sky_sun.jpg",       "drift": [0.3, 0], "lines": "Көк байрағым, желбіре / Тәуелсіз елдің ұраны / …ардақты"},
+  {"start": 20.74, "end": 29.76, "image": "/tmp/claude-0/-home-user-Saltow/98068416-2059-5985-bf61-10d3aadf831c/scratchpad/painted/04_yurts.jpg",         "drift": [-0.3, 0], "lines": "Ана тілім / Домбырам / Бабадан қалған / Қорғаймын сені, Отаным"},
+  {"start": 29.76, "end": 34.22, "image": "/tmp/claude-0/-home-user-Saltow/98068416-2059-5985-bf61-10d3aadf831c/scratchpad/painted/05_capital.jpg",       "drift": [0.3, 0], "lines": "Қазақстан – алтын ұям / …мекенім"},
+  {"start": 34.22, "end": 42.7,  "image": "/tmp/claude-0/-home-user-Saltow/98068416-2059-5985-bf61-10d3aadf831c/scratchpad/painted/06_sunset.jpg",        "drift": [-0.3, 0], "lines": "Бес жасар кішкентай болсам да / Елімді мақтан етемін"}
+ ]
+}
