@@ -1,0 +1,6 @@
+inbox/
+broll/
+projects/*/media/
+projects/*/*.mp4
+projects/*/*.wav
+projects/*/check/
