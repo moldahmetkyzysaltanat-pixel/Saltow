@@ -158,8 +158,8 @@ def build_sfx(N, renderer):
         if g["type"] == "badge":
             put(pop(), g["a"] + .25, .8)
         if g["type"] == "list":
-            for t_item, _ in g["items"]:
-                put(pop(), renderer.tl.e(t_item) - .05, .8)
+            for item in g["items"]:
+                put(pop(), renderer.tl.e(item[0]) - .05, .8)
         if g["type"] == "progress":
             put(ding(), g["b"] - 1.2, 1.0)
     if renderer.outro:

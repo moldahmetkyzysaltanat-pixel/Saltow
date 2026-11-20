@@ -129,11 +129,14 @@ class Renderer:
                 if g.get("title"):
                     s = self.sp(key + "t", lambda: pill(g["title"], g.get("icon", "star"), fs=40, icbg=col))
                     blit(fr, s, W / 2, y, back_out(d / .4), min(1, d / .15) * out)
-                for j, (t_item, name) in enumerate(g["items"]):
+                for j, item in enumerate(g["items"]):
+                    t_item, name = item[0], item[1]
+                    ic = item[2] if len(item) > 2 else "check"          # e.g. "cross" for "not available"
                     dd = te - (self.tl.e(t_item) - 0.05)
                     if dd < 0:
                         continue
-                    s = self.sp(key + name, lambda: pill(name, "check", fs=34, icbg=hex_rgba("#22C55E")))
+                    icol = hex_rgba("#EF4444" if ic == "cross" else "#22C55E")
+                    s = self.sp(key + name, lambda: pill(name, ic, fs=34, icbg=icol))
                     x = W / 2 + (-235 if j % 2 == 0 else 235)
                     yy = y + 130 + (j // 2) * 108
                     blit(fr, s, x, yy + 30 * (1 - ease_out(dd / .35)), back_out(dd / .35), min(1, dd / .12) * out)
