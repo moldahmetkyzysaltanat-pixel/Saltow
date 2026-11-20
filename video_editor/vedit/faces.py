@@ -9,6 +9,7 @@ def detect(video, out_json, width, height, samples_per_sec=5):
     import cv2
 
     cc = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    pc = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_profileface.xml")   # people seen side-on
     sw, sh = width // 2, height // 2
     p = subprocess.Popen(["ffmpeg", "-v", "error", "-i", video, "-vf", f"fps={samples_per_sec},scale={sw}:{sh}",
                           "-f", "rawvideo", "-pix_fmt", "gray", "-"], stdout=subprocess.PIPE)
@@ -18,7 +19,11 @@ def detect(video, out_json, width, height, samples_per_sec=5):
         if len(buf) < sw * sh:
             break
         g = np.frombuffer(buf, np.uint8).reshape(sh, sw)
-        fs = cc.detectMultiScale(g, 1.1, 6, minSize=(sw // 27, sw // 27))
+        ms = (sw // 27, sw // 27)
+        fs = [tuple(f) for f in cc.detectMultiScale(g, 1.1, 6, minSize=ms)]
+        if not fs:
+            fs = [tuple(f) for f in pc.detectMultiScale(g, 1.1, 5, minSize=ms)]
+            fs += [(sw - x - w, y, w, h) for x, y, w, h in pc.detectMultiScale(cv2.flip(g, 1), 1.1, 5, minSize=ms)]
         out.append({"t": i / samples_per_sec,
                     "faces": [[int(x) * 2, int(y) * 2, int(w) * 2, int(h) * 2] for x, y, w, h in fs]})
         i += 1
