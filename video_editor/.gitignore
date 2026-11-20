@@ -1,0 +1,7 @@
+projects/
+media/
+*.mp4
+*.mov
+*.MOV
+*.wav
+__pycache__/

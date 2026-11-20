@@ -1,0 +1,5 @@
+numpy
+pillow
+opencv-python-headless<5
+faster-whisper
+anthropic

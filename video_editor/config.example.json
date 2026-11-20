@@ -1,0 +1,31 @@
+{
+  "output": {"name": "Safi_video2_reels"},
+  "grade": {"contrast": 1.07, "saturation": 1.12, "gamma": 0.98, "warmth": 0.02, "vignette": 0.22},
+  "cuts": {"min_pause": 0.45, "threshold_db": -30, "end_at": 41.3, "remove": []},
+  "speakers": [
+    {"start": 0, "end": 8.1, "side": "right"},
+    {"start": 8.1, "end": 17.9, "side": "left"},
+    {"start": 17.9, "end": 23.3, "side": "right"},
+    {"start": 23.3, "end": 26.95, "side": "left"},
+    {"start": 26.95, "end": 40.0, "side": "right"},
+    {"start": 40.0, "end": 99, "side": "left"}
+  ],
+  "zoom": {"punch": 1.2, "drift": 0.03, "emphasis": [1.14, 20.48]},
+  "subtitles": {"mode": "karaoke", "font": "Inter ExtraBold", "size": 76, "uppercase": true,
+                "color": "#FFFFFF", "highlight": "#FFD84A", "outline": 7, "shadow": 2,
+                "position_y": 0.73, "max_chars_per_line": 16, "words_per_page": 3},
+  "broll": [
+    {"start": 5.9, "end": 8.05, "file": "media/broll_source.mov", "source_start": 55, "crop": "680:1209:1480:1720",
+     "label": "SAFI = ТАЗА · ТАБИҒИ", "icon": "leaf"},
+    {"start": 18.0, "end": 21.2, "file": "media/broll_source.mov", "source_start": 50, "crop": "900:1600:1260:1680",
+     "label": "МАЛАЙЗИЯ · ИНДОНЕЗИЯ", "icon": "pin"}
+  ],
+  "graphics": [
+    {"type": "card", "start": 0.2, "end": 5.8, "lines": ["SAFI", "«ТАЗА ӘРІ ТАБИҒИ»"], "y": 300, "sfx": "impact"},
+    {"type": "pill", "start": 14.4, "end": 17.0, "text": "ҚАЙ ЕЛДЕРДЕ БАР?", "icon": "pin", "color": "#2563EB"},
+    {"type": "list", "start": 30.7, "end": 40.3, "title": "SAFI ҚАЙ ЕЛДЕРДЕ БАР", "y": 200,
+     "items": [[30.9, "СИНГАПУР"], [31.9, "БАНГЛАДЕШ"], [33.4, "ПӘКІСТАН"], [34.64, "МАЛЬДИВ"], [36.06, "ТАЯУ ШЫҒЫС"], [39.06, "ӨЗБЕКСТАН"]]}
+  ],
+  "outro": {"duration": 1.3, "lines": ["SAFI", "ТАЗА · ТАБИҒИ · ХАЛАЛ"], "pill": "ЕНДІ ҚАЗАҚСТАНДА!", "icon": "heart"},
+  "audio": {"music": {"file": null, "level_db": -18, "duck_db": -11}, "sfx": true, "sfx_db": -2}
+}
