@@ -120,8 +120,8 @@ def label(text, size=46):
     f = font(SEMI, size)
     bb = f.getbbox(text)
     im = Image.new("RGBA", (bb[2] - bb[0] + 20, int(size * 1.5)), (0, 0, 0, 0))
-    ImageDraw.Draw(im).text((10 - bb[0], size * 0.2), text, font=f, fill=LIME)
-    return glow(pad(im), radius=12, strength=0.6)
+    ImageDraw.Draw(im).text((10 - bb[0], size * 0.2), text, font=f, fill=LIME, stroke_width=2, stroke_fill=(16, 16, 16))
+    return shadow(glow(pad(im), radius=12, strength=0.6), radius=10, alpha=230, off=(0, 3))
 
 
 def big_text(text, size=120, color=WHITE, edge=True, max_w=960):
@@ -182,6 +182,10 @@ def _icon(kind, size, color=LIME):
         d.rounded_rectangle([0, 0, s - 1, s - 1], radius=int(s * .18), fill=RED)
         d.line([(s * .27, s * .27), (s * .73, s * .73)], fill=WHITE, width=lw)
         d.line([(s * .73, s * .27), (s * .27, s * .73)], fill=WHITE, width=lw)
+    elif kind == "telegram":
+        d.ellipse([0, 0, s - 1, s - 1], fill=(42, 171, 238))
+        d.polygon([(s * .2, s * .5), (s * .76, s * .27), (s * .66, s * .76), (s * .48, s * .62)], fill=WHITE)
+        d.polygon([(s * .42, s * .58), (s * .48, s * .76), (s * .54, s * .66)], fill=(200, 225, 245))
     elif kind == "bigx":
         lw2 = int(s * .13)
         d.line([(s * .1, s * .1), (s * .9, s * .9)], fill=color, width=lw2)
@@ -200,7 +204,7 @@ def stat_card(title="Reels", sub="· қаралым", value="1 000 000 000", ico
     w, h = 900, 240
     im = _card(w, h)
     d = ImageDraw.Draw(im)
-    ic = _instagram(140) if icon == "instagram" else _icon(icon, 120)
+    ic = _instagram(140) if icon == "instagram" else _icon(icon, 130)
     im.alpha_composite(ic, (34, (h - ic.height) // 2))
     d.text((210, 52), title, font=font(SEMI, 38), fill=(200, 200, 200))
     tw = font(SEMI, 38).getlength(title)
