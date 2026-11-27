@@ -5,7 +5,7 @@ SR = A.SR
 SEGS = [[0, 2.18], [2.62, 6.52], [7.12, 9.12], [9.42, 10.24], [10.88, 12.57], [13.31, 20.08], [20.87, 25.06]]
 TOTAL = sum(b - a for a, b in SEGS) + 1.30
 subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", "voice_raw.wav", "-af",
-  "highpass=f=80,afftdn=nr=8:nf=-45,equalizer=f=250:t=q:w=1.2:g=-1.5,equalizer=f=3500:t=q:w=1:g=2,acompressor=threshold=-20dB:ratio=2.5:attack=8:release=160",
+  "highpass=f=80,afftdn=nr=8:nf=-45,equalizer=f=250:t=q:w=1.2:g=-1.5,equalizer=f=3500:t=q:w=1:g=2,acompressor=threshold=-26dB:ratio=3:attack=6:release=200:makeup=3",
   "-ar", str(SR), "-ac", "1", "voice_clean.wav"], check=True)
 v = A.read_wav("voice_clean.wav")
 # energy check at every cut point (should be near silence)
