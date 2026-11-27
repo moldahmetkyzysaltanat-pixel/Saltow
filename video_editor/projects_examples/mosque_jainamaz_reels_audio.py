@@ -6,8 +6,8 @@ v = A.read_wav("voice_raw.wav")                     # original voiceover, untouc
 N = len(v)
 m = A.synth_music(N, seed=21, bpm=96)
 m[:SR] *= np.linspace(0, 1, SR); m[-int(1.2 * SR):] *= np.linspace(1, 0, int(1.2 * SR))
-m *= 10 ** (-27 / 20) / (np.sqrt(np.mean(m ** 2)) + 1e-9)   # quiet bed
-m = A.duck(v, m, -14)
+m *= 10 ** (-34 / 20) / (np.sqrt(np.mean(m ** 2)) + 1e-9)   # quiet bed
+m = A.duck(v, m, -16)
 sfx = np.zeros(N, np.float32)
 def put(x, t, g):
     i = int(max(0, t) * SR); n = min(len(x), N - i)

@@ -173,62 +173,101 @@ def dot(name, active):
         return N.shadow(im, 8, 160, (0, 3))
     return spr(("dot", name, active), mk)
 
+BANDS = {}
+BAND_Y = {1: 760, 2: 690, 3: 700, 4: 690, 5: 720}
+def band(i):
+    if i not in BANDS:
+        im = Image.open(os.path.join(B.G, f"p{i}.png")).convert("RGB")
+        y = BAND_Y[i]; im = im.crop((245, y, 1375, y + 402)).resize((W, 384), Image.LANCZOS)
+        BANDS[i] = np.asarray(im)[..., ::-1].astype(np.float32)
+    return BANDS[i]
+
+def collage(fr, te, a0=7.84, a1=10.40):
+    """5 full-width bands (one per colour) slide in alternately from left/right with motion blur."""
+    if not (a0 - .05 <= te < a1 + .3): return
+    out = 1 - eio((te - a1) / .3) if te > a1 else 1
+    order = [2, 3, 5, 1, 4]
+    base = fr.copy()
+    canvas = np.zeros_like(fr) + np.array(N.BG[::-1], np.float32)
+    for j, i in enumerate(order):
+        d = te - (a0 + j * .14)
+        if d < 0: continue
+        k = eo(d / .5); s = -1 if j % 2 == 0 else 1
+        img = band(i)
+        dx = int(s * W * (1 - k))
+        blur = int(60 * (1 - k))
+        if blur > 2: img = cv2.blur(img, (blur, 1))
+        y0 = j * 384
+        x0, x1 = max(0, dx), min(W, W + dx)
+        canvas[y0:y0 + 384, x0:x1] = img[:, x0 - dx:x1 - dx]
+    # thin lime separators drawn after bands settle
+    for j in range(1, 5):
+        k = eo((te - a0 - .8 - j * .05) / .4)
+        if k > 0:
+            cv2.line(canvas, (int(W / 2 - W / 2 * k), j * 384), (int(W / 2 + W / 2 * k), j * 384), N.LIME[::-1], 4, cv2.LINE_AA)
+    fr[:] = base * (1 - out) + canvas * out
+    blit(fr, spr("h5", lambda: N.headline("5 түрлі түс", frame=True, size=110)), W / 2, 960,
+         .85 + .15 * back((te - a0 - .7) / .4), out * clamp((te - a0 - .7) / .15))
+
 def motion(fr, te):
+    # "әдемілігі" — framed neon headline
+    a = fadeio(te, 2.30, 4.55)
+    if a: blit(fr, spr("h1", lambda: N.headline("әдемілігі", label="көздің жауын алады", size=120)), W / 2, 560,
+               .85 + .15 * back((te - 2.30) / .38), a)
     # pointer to the mosque image
     a = fadeio(te, 6.2, 7.80)
     if a:
         c = (W * .5, 940); ring(fr, c, 330, eo((te - 6.2) / .6), a)
         ln(fr, (c[0] + 233, c[1] - 233), (c[0] + 330, c[1] - 380), eo((te - 6.6) / .35), 4, a)
         if te > 6.9: blit(fr, spr("lb1", lambda: N.label("мешіт бейнесі", 44)), c[0] + 300, c[1] - 430, 1, a * clamp((te - 6.9) / .2))
-    # 5 colours collage (blurred background + 5 mats appear one by one, big "5")
-    a = fadeio(te, 7.84, 10.30, .25, .3)
-    if a:
-        bg = cv2.GaussianBlur(fr, (0, 0), 25) * .45
-        fr[:] = fr * (1 - a) + bg * a
-        blit(fr, spr("five", lambda: N.big_text("5", 260, N.LIME, edge=False)), W / 2, 470, .85 + .15 * back((te - 7.9) / .4), a)
-        blit(fr, spr("five_l", lambda: N.label("түрлі түс", 50)), W / 2, 640, 1, a * clamp((te - 8.3) / .2))
-        order = [2, 3, 5, 1, 4]
-        for j, i in enumerate(order):
-            d = te - (8.0 + j * .16)
-            if d < 0: continue
-            x = W / 2 + (j - 2) * 205; y = 950 + (0 if j % 2 == 0 else 40)
-            blit(fr, thumb(i), x, y + 80 * (1 - eo(d / .45)), 1, a * clamp(d / .2))
-    # colour dots: light up as each colour is named
-    names = [("қызыл", 10.46, 15.40), ("сары", 12.02, 15.40), ("розовый", 12.68, 15.40), ("көгілдір", 13.42, 15.40), ("көмір", 14.52, 15.40)]
+    # colour dots + active colour name
+    names = [("қызыл", 10.46), ("сары", 12.02), ("розовый", 12.68), ("көгілдір", 13.42), ("көмір", 14.52)]
     a = fadeio(te, 10.46, 15.35)
     if a:
-        for j, (nm, t0, _) in enumerate(names):
+        blit(fr, spr("lbc", lambda: N.label("түстері", 46)), W / 2, 200, 1, a)
+        for j, (nm, t0) in enumerate(names):
             d = te - t0
             if d < 0: continue
             nxt = names[j + 1][1] if j + 1 < len(names) else 15.4
             active = t0 <= te < nxt
-            blit(fr, dot(nm, active), W / 2 + (j - 2) * 120, 300, (1.12 if active else 1) * (.6 + .4 * back(d / .35)), a * clamp(d / .15))
-    # price: was 9 000 -> now 6 000 for 10 pcs
-    a = fadeio(te, 18.56, 26.44)
+            blit(fr, dot(nm, active), W / 2 + (j - 2) * 120, 310, (1.12 if active else 1) * (.6 + .4 * back(d / .35)), a * clamp(d / .15))
+            if active:
+                blit(fr, spr(("ct", nm), lambda nm=nm: N.tag(nm.upper(), size=44)), W / 2, 430, back(d / .3), a)
+    # quality ✓
+    for t0, t1 in ((16.20, 17.12), (30.10, 31.20)):
+        a = fadeio(te, t0, t1)
+        if a: blit(fr, spr("q", lambda: N.check_row("сапасы — сөз жоқ", True)), W / 2 + (1 - eo((te - t0) / .3)) * -60, 520, 1, a)
+    # old price card, struck through on "жеңілдікпен"
+    a = fadeio(te, 18.56, 22.84)
     if a:
-        k9 = clamp((te - 18.56) / .25)
-        s9 = spr("p9", lambda: N.big_text("9 000 ₸", 110, (235, 235, 235), edge=False))
-        y9 = 520 if te < 22.84 else 520 - 120 * eo((te - 22.84) / .4)
-        sc9 = 1 if te < 22.84 else 1 - .35 * eo((te - 22.84) / .4)
-        blit(fr, s9, W / 2, y9, sc9, a * k9)
+        blit(fr, spr("lb9", lambda: N.label("бұрынғы баға", 46)), W / 2, 330, 1, a)
+        s9 = spr("s9", lambda: N.stat_card("Жайнамаз", "· бұрын", "9 000 ₸", "play"))
+        blit(fr, s9, W / 2, 520 + 60 * (1 - eo((te - 18.56) / .45)), 1, a)
         if te >= 21.1:
-            tw = s9.w * sc9 / 2 - 50
-            ln(fr, (W / 2 - tw, y9 + 4), (W / 2 + tw, y9 - 10), eo((te - 21.1) / .35), 7, a, (232, 52, 66))
-        if te >= 21.1 and te < 22.84:
-            blit(fr, spr("disc", lambda: N.tag("жеңілдік", size=46)), W / 2, 660, back((te - 21.1) / .35), a)
-        if te >= 22.84:
-            p = eexpo((te - 22.84) / .7); p = 1 if p > .96 else p
-            v = int(round((9000 + (6000 - 9000) * p) / 100) * 100); txt = f"{v:,}".replace(",", " ") + " ₸"
-            blit(fr, spr(("p6", txt), lambda: N.big_text(txt, 190, N.LIME, edge=False)), W / 2, 600, .9 + .1 * back((te - 22.84) / .4), a * clamp((te - 22.84) / .12))
+            ln(fr, (W / 2 - 160, 545), (W / 2 + 260, 530), eo((te - 21.1) / .35), 8, a, (232, 52, 66))
+            blit(fr, spr("disc", lambda: N.tag("ЖЕҢІЛДІК", size=50)), W / 2, 720, back((te - 21.1) / .35), a)
+    # new price: wallet card counting 9 000 -> 6 000, then "10 ДАНА"
+    a = fadeio(te, 22.84, 26.44)
+    if a:
+        blit(fr, spr("lb6", lambda: N.label("қазір", 46)), W / 2, 300, 1, a)
+        p = eexpo((te - 22.84) / .7); p = 1 if p > .96 else p
+        v = int(round((9000 + (6000 - 9000) * p) / 100) * 100); txt = f"{v:,}".replace(",", " ") + " ₸"
+        blit(fr, spr(("w6", txt), lambda: N.wallet_card("бар болғаны", "KZT", txt, cross=False)), W / 2,
+             560 + 60 * (1 - eo((te - 22.84) / .45)), .96 + .04 * eo((te - 22.84) / .45), a)
         if te >= 24.92:
-            blit(fr, spr("ten", lambda: N.tag("10 ДАНА", size=56)), W / 2, 790, back((te - 24.92) / .35), a)
-    # end card
+            blit(fr, spr("ten", lambda: N.tag("10 ДАНА", size=58)), W / 2, 820, back((te - 24.92) / .35), a)
+    # "ойланбай" — framed headline with accent
+    a = fadeio(te, 27.26, 29.10)
+    if a: blit(fr, spr("h8", lambda: N.headline("ойланбай", accent="!", size=130)), W / 2, 620, .85 + .15 * back((te - 27.26) / .38), a)
+    # end card (dark interlude, neon)
     if te >= 31.25:
         d = te - 31.25
-        fr *= 1 - .3 * eio(d / .5)
-        blit(fr, spr("e1", lambda: N.big_text("6 000 ₸", 200, N.LIME, edge=False)), W / 2, 780, .9 + .1 * back(d / .4), clamp(d / .15))
-        blit(fr, spr("e2", lambda: N.tag("10 ДАНА", size=56)), W / 2, 960, back((d - .25) / .35), clamp((d - .25) / .15))
-        blit(fr, spr("e3", lambda: N.label("5 түрлі түс · мешіт бейнесі", 44)), W / 2, 1080, 1, clamp((d - .45) / .2))
+        k = eio(d / .45)
+        fr[:] = fr * (1 - k) + N.interlude_bg(W, H, te) * k
+        blit(fr, spr("e0", lambda: N.label("мешіт бейнелі жайнамаз", 46)), W / 2, 600, 1, clamp(d / .2))
+        blit(fr, spr("e1", lambda: N.big_text("6 000 ₸", 210, N.LIME, edge=False)), W / 2, 780, .9 + .1 * back(d / .4), clamp(d / .15))
+        blit(fr, spr("e2", lambda: N.tag("10 ДАНА", size=58)), W / 2, 960, back((d - .25) / .35), clamp((d - .25) / .15))
+        blit(fr, spr("e3", lambda: N.label("5 түрлі түс", 44)), W / 2, 1080, 1, clamp((d - .45) / .2))
 
 # ------------------------------------------------------------------ render
 def main(out):
@@ -252,6 +291,8 @@ def main(out):
             kind, dur = TRANS[SHOTS[i][3]]
             fr = B.transition(kind, clamp((te - (SHOTS[i][3] - dur / 2)) / dur), fs[i], fs[j])
         fr = fr * grade
+        collage(fr, te)
+        if 7.78 <= te < 10.75: fr *= grade
         motion(fr, te)
         captions(fr, te)
         if te < .35: fr *= eo(te / .35)
