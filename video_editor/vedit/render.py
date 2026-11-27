@@ -11,6 +11,7 @@ import cv2
 import numpy as np
 
 from . import gfx
+from . import neon
 from .gfx import (Sprite, back_out, badge_circle, blit, caption_card, ease_in_out, ease_out, hex_rgba, icon,
                   pill)
 
@@ -111,8 +112,11 @@ class Renderer:
             out = min(1, r / 0.3)
             y = g.get("y", 330)
             key = repr(sorted((k, str(v)) for k, v in g.items()))
-            col = hex_rgba(g.get("color", "#14B8A0"))
             t = g["type"]
+            if t.startswith("neon_"):
+                self.draw_neon(fr, g, te, d, out, key)
+                continue
+            col = hex_rgba(g.get("color", "#14B8A0"))
             if t == "card":
                 s = self.sp(key, lambda: caption_card(g["lines"], fs=g.get("size", 52)))
                 blit(fr, s, W / 2, y - 40 * (1 - ease_out(d / .5)), 0.9 + 0.1 * back_out(d / .5), min(1, d / .25) * out)
@@ -154,6 +158,95 @@ class Renderer:
                 cv2.rectangle(ov, (x0, by), (x0 + bw, by + bh), (40, 30, 25), -1, cv2.LINE_AA)
                 cv2.rectangle(ov, (x0, by), (x0 + int(bw * p), by + bh), (74, 213, 255), -1, cv2.LINE_AA)
                 cv2.addWeighted(ov, 0.92 * al, fr, 1 - 0.92 * al, 0, fr)
+
+    # ---------- NEON LIME style (see vedit/neon.py) ----------
+    def neon_sprite(self, key, fn):
+        if key not in self.spr:
+            self.spr[key] = Sprite(fn())
+        return self.spr[key]
+
+    def draw_neon(self, fr, g, te, d, out, key):
+        W, H = self.W, self.H
+        t = g["type"]
+        x = W / 2 + g.get("x", 0)
+        y = g.get("y", 1150)
+        pop = back_out(d / .38)
+        fade = min(1, d / .15) * out
+        if t == "neon_headline":
+            s = self.neon_sprite(key, lambda: neon.headline(g["word"], g.get("label"), g.get("frame", True),
+                                                             g.get("accent"), g.get("size", 150)))
+            blit(fr, s, x, y, 0.85 + 0.15 * pop, fade)
+        elif t == "neon_tag":
+            s = self.neon_sprite(key, lambda: neon.tag(g["text"], g.get("color", "lime"), g.get("size", 48)))
+            blit(fr, s, x, y, pop, fade)
+        elif t == "neon_label":
+            s = self.neon_sprite(key, lambda: neon.label(g["text"], g.get("size", 46)))
+            blit(fr, s, x, y + 20 * (1 - ease_out(d / .3)), 1, fade)
+        elif t in ("neon_stat", "neon_wallet"):
+            fn = (lambda: neon.stat_card(g.get("title", "Reels"), g.get("sub", "· қаралым"), g.get("value", ""),
+                                         g.get("icon", "instagram"))) if t == "neon_stat" else \
+                 (lambda: neon.wallet_card(g.get("title", "шотың"), g.get("currency", "KZT"), g.get("value", "0 ₸"),
+                                           g.get("cross", True)))
+            s = self.neon_sprite(key, fn)
+            blit(fr, s, x, y + 70 * (1 - ease_out(d / .45)), 0.96 + 0.04 * ease_out(d / .45), fade)
+        elif t == "neon_checklist":
+            items = g["items"]
+            fs = self.neon_sprite(key + "f", lambda: neon.checklist_frame(len(items)))
+            blit(fr, fs, x, y, 0.9 + 0.1 * pop, fade)
+            top = y - fs.h / 2 + 40 + 25
+            if g.get("title"):
+                ts = self.neon_sprite(key + "t", lambda: neon.tag(g["title"], size=36))
+                blit(fr, ts, x - 200, y - fs.h / 2 + 40, pop, fade)
+            for j, (t_item, text, ok) in enumerate(items):
+                dd = te - self.tl.e(t_item)
+                if dd < 0:
+                    continue
+                rs = self.neon_sprite(key + text, lambda: neon.check_row(text, ok))
+                blit(fr, rs, x + (1 - ease_out(dd / .35)) * -60, top + 52 + j * 104, 1, min(1, dd / .15) * out)
+        elif t == "neon_tree":
+            rs = self.neon_sprite(key + "r", lambda: neon.tree_root(g["root"], g.get("label")))
+            blit(fr, rs, x, y, 0.85 + 0.15 * pop, fade)
+            sx = int(x - rs.w / 2 + 75)
+            sy = int(y + rs.h / 2 - 30)
+            for j, item in enumerate(g["items"]):
+                t_item, text = item[0], item[1]
+                ic = item[2] if len(item) > 2 else "user"
+                dd = te - self.tl.e(t_item)
+                if dd < 0:
+                    continue
+                iy = sy + 110 + j * 150
+                k = ease_out(dd / .35)
+                ov = fr.copy()
+                cv2.line(ov, (sx, sy), (sx, int(sy + (iy - sy) * k)), neon.LIME[::-1], 4, cv2.LINE_AA)
+                if k > .6:
+                    cv2.line(ov, (sx, iy), (int(sx + 60 * (k - .6) / .4), iy), neon.LIME[::-1], 4, cv2.LINE_AA)
+                cv2.addWeighted(ov, out, fr, 1 - out, 0, fr)
+                its = self.neon_sprite(key + text, lambda: neon.tree_item(text, ic))
+                blit(fr, its, sx + 60 + its.w / 2 - 40, iy, 0.9 + 0.1 * back_out(dd / .35), min(1, dd / .15) * out)
+        elif t == "neon_arrow":
+            L = g.get("length", 160)
+            k = ease_out(d / .4)
+            ov = fr.copy()
+            cv2.line(ov, (int(x), int(y)), (int(x), int(y + L * k)), neon.LIME[::-1], 5, cv2.LINE_AA)
+            if k > .8:
+                ye = int(y + L)
+                cv2.line(ov, (int(x) - 20, ye - 22), (int(x), ye), neon.LIME[::-1], 5, cv2.LINE_AA)
+                cv2.line(ov, (int(x) + 20, ye - 22), (int(x), ye), neon.LIME[::-1], 5, cv2.LINE_AA)
+            cv2.addWeighted(ov, out, fr, 1 - out, 0, fr)
+        elif t == "neon_counter":
+            p = ease_out(d / g.get("dur", .9))
+            v = g.get("from", 0) + (g["to"] - g.get("from", 0)) * p
+            txt = f"{int(round(v)):,}".replace(",", " ") + g.get("suffix", "")
+            s = self.neon_sprite("cnt" + txt + str(g.get("size", 150)),
+                                 lambda: neon.big_text(txt, g.get("size", 150), neon.LIME, edge=False))
+            blit(fr, s, x, y, 0.9 + 0.1 * pop, fade)
+
+    def interlude(self, fr, te):
+        for g in self.gfx:
+            if g["type"] == "neon_interlude" and g["a"] - 0.2 <= te < g["b"] + 0.2:
+                k = min(ease_in_out((te - g["a"] + 0.2) / 0.4), ease_in_out((g["b"] + 0.2 - te) / 0.4))
+                bg = neon.interlude_bg(self.W, self.H, te)
+                fr[:] = fr * (1 - k) + bg * k
 
     def draw_outro(self, fr, te):
         o = self.cfg["outro"]
@@ -211,6 +304,7 @@ class Renderer:
                     if fl > 0:
                         fr = fr * (1 - fl) + 255 * fl
             fr *= self.vig
+            self.interlude(fr, te)
             self.draw_graphics(fr, te)
             if self.outro and te >= self.outro[0]:
                 self.draw_outro(fr, te)

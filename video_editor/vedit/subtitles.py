@@ -31,6 +31,19 @@ DEFAULT = {
 }
 
 
+# Saved looks. Use in config: "subtitles": {"preset": "neon_lime"} (other keys override the preset).
+PRESETS = {
+    # reference reel: heavy white uppercase, thin dark edge, the spoken word in neon lime
+    "neon_lime": {"mode": "karaoke", "font": "Montserrat Black", "size": 84, "uppercase": True,
+                  "color": "#FFFFFF", "highlight": "#D6FD3D", "outline": 3, "outline_color": "#141414",
+                  "shadow": 3, "position_y": 0.77, "max_chars_per_line": 15, "words_per_page": 3, "pop": True},
+    # premium editorial (prayer-mat reel): no outline, soft shadow, clean phrases
+    "premium_editorial": {"mode": "phrase", "font": "Montserrat ExtraBold", "size": 64, "uppercase": False,
+                          "color": "#FFFFFF", "highlight": "#F0D296", "outline": 0, "outline_color": "#000000",
+                          "shadow": 2, "position_y": 0.68, "max_chars_per_line": 20, "pop": True},
+}
+
+
 def _upper(s, on):
     # Python upper() handles Kazakh letters (ә->Ә, і->І, ...)
     return s.upper() if on else s
@@ -76,7 +89,11 @@ def _lines(idx, words, max_chars):
 
 def build(subs, timeline, cfg, width, height, ass_path, srt_path):
     """subs: [{start, end, kk}] in SOURCE time; timeline maps to edited time."""
-    c = {**DEFAULT, **(cfg or {})}
+    cfg = cfg or {}
+    c = {**DEFAULT, **PRESETS.get(cfg.get("preset"), {}), **cfg}
+    if c.get("preset") and not cfg.get("fonts_dir"):
+        import os
+        c["fonts_dir"] = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "fonts")
     margin_v = int(height * (1 - c["position_y"]))
     style = (f"Style: KZ,{c['font']},{c['size']},{ass_color(c['color'])},{ass_color(c['color'])},"
              f"{ass_color(c['outline_color'])},{ass_color('#000000', 0x80)},0,0,0,0,100,100,"

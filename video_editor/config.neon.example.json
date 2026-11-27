@@ -1,0 +1,147 @@
+{
+ "output": {
+  "name": "neon_reels"
+ },
+ "grade": {
+  "contrast": 1.06,
+  "saturation": 1.05,
+  "gamma": 0.97,
+  "warmth": 0.01,
+  "vignette": 0.28
+ },
+ "cuts": {
+  "min_pause": 0.45,
+  "threshold_db": -30,
+  "remove": []
+ },
+ "zoom": {
+  "punch": 1.2,
+  "drift": 0.03,
+  "emphasis": [
+   3.0
+  ]
+ },
+ "subtitles": {
+  "preset": "neon_lime"
+ },
+ "graphics": [
+  {
+   "type": "neon_headline",
+   "start": 0.2,
+   "end": 2.0,
+   "word": "Не үшін",
+   "label": "түсіріп жатқаныңды",
+   "accent": "?",
+   "y": 1000
+  },
+  {
+   "type": "neon_interlude",
+   "start": 2.0,
+   "end": 5.0
+  },
+  {
+   "type": "neon_label",
+   "start": 2.1,
+   "end": 5.0,
+   "text": "себебі",
+   "y": 330
+  },
+  {
+   "type": "neon_stat",
+   "start": 2.2,
+   "end": 5.0,
+   "value": "1 000 000 000",
+   "y": 520
+  },
+  {
+   "type": "neon_arrow",
+   "start": 2.8,
+   "end": 5.0,
+   "y": 670,
+   "length": 150
+  },
+  {
+   "type": "neon_wallet",
+   "start": 3.2,
+   "end": 5.0,
+   "value": "0 ₸",
+   "y": 990
+  },
+  {
+   "type": "neon_tag",
+   "start": 3.8,
+   "end": 5.0,
+   "text": "айналмайды",
+   "y": 1215
+  },
+  {
+   "type": "neon_checklist",
+   "start": 5.2,
+   "end": 8.0,
+   "title": "себебі",
+   "y": 1000,
+   "items": [
+    [
+     5.6,
+     "қаралым жиналды",
+     true
+    ],
+    [
+     6.6,
+     "стратегия",
+     false
+    ]
+   ]
+  },
+  {
+   "type": "neon_interlude",
+   "start": 8.2,
+   "end": 11.0
+  },
+  {
+   "type": "neon_tree",
+   "start": 8.3,
+   "end": 11.0,
+   "root": "Позиция",
+   "label": "ең алдымен",
+   "y": 560,
+   "items": [
+    [
+     9.0,
+     "Сен кімсің?",
+     "user"
+    ],
+    [
+     9.8,
+     "Кімге сатасың?",
+     "target"
+    ]
+   ]
+  },
+  {
+   "type": "neon_tag",
+   "start": 11.2,
+   "end": 12.5,
+   "text": "емес",
+   "color": "red",
+   "y": 1000
+  },
+  {
+   "type": "neon_counter",
+   "start": 12.5,
+   "end": 14.5,
+   "from": 0,
+   "to": 1000000000,
+   "y": 700
+  }
+ ],
+ "audio": {
+  "music": {
+   "file": null,
+   "level_db": -18,
+   "duck_db": -11
+  },
+  "sfx": true,
+  "sfx_db": -2
+ }
+}

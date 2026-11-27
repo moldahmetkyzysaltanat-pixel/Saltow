@@ -91,6 +91,13 @@ python edit.py render -p projects/safi -c config.json --preview 5 --preview-star
 
 `subtitles.json` ішінде сөзді `*жұлдызшамен*` қоршасаңыз, ол highlight түсімен шығады.
 
+## Сақталған стильдер
+
+Толығы `STYLE_GUIDE.md` файлында.
+
+- **NEON LIME** (референс Reels): `config.neon.example.json` + `"subtitles": {"preset": "neon_lime"}`
+- **PREMIUM EDITORIAL** (екі шрифт, обводкасыз): `"subtitles": {"preset": "premium_editorial"}`, мысал скрипт: `projects_examples/premium_reels_jainamaz.py`
+
 ## Модульдер
 
 | Файл | Міндеті |
@@ -101,6 +108,7 @@ python edit.py render -p projects/safi -c config.json --preview 5 --preview-star
 | `vedit/faces.py` | Бет трекингі (OpenCV) |
 | `vedit/render.py` | Zoom, B-roll, графика, outro |
 | `vedit/gfx.py` | Графика спрайттары мен easing |
+| `vedit/neon.py` | NEON LIME стилінің компоненттері (карточкалар, headline, tag, tree, interlude) |
 | `vedit/subtitles.py` | ASS/SRT, karaoke және phrase стильдері |
 | `vedit/audio.py` | Дауысты кесу, музыка, SFX, ducking |
 | `vedit/translate.py` | Claude API (`claude-opus-5-5`) арқылы ағылшыннан қазақшаға аудару |

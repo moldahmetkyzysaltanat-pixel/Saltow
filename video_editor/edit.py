@@ -163,7 +163,7 @@ def render(args):
 
     log("export...")
     name = cfg.get("output", {}).get("name", "final")
-    fonts_dir = (cfg.get("subtitles") or {}).get("fonts_dir") or "/usr/share/fonts"
+    fonts_dir = (cfg.get("subtitles") or {}).get("fonts_dir") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts")
     ass = P(pj, "subs.ass").replace("\\", "/").replace(":", "\\:")
     fd = fonts_dir.replace("\\", "/").replace(":", "\\:")
     a_off = ["-ss", str(args.preview_start)] if args.preview_start else []
