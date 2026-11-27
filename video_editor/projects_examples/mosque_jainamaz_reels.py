@@ -77,12 +77,12 @@ WHITE, CREAM, LIME = (255, 255, 255), (255, 255, 255), N.LIME
 def T(text, t, kind="sans", size=58, w=800, color=WHITE): return (text, t, kind, size, w, color)
 CAPS = [
     (1.06, 2.26, [[T("Мына", 1.06, size=54, w=600)], [T("жайнамаздардың", 1.62, size=74, w=900)]]),
-    (2.28, 4.62, [[T("әдемілігі", 2.28, "serif", 110, color=CREAM)], [T("көздің жауын", 3.02, size=60), T("алады,", 3.92, size=60)]]),
-    (4.22, 5.66, [[T("білем.", 4.22, "serif", 96, color=CREAM)]]),
+    (2.28, 4.18, [[T("әдемілігі", 2.28, "serif", 110, color=CREAM)], [T("көздің жауын", 3.02, size=60), T("алады,", 3.92, size=60)]]),
+    (4.22, 5.66, [[T("прям!", 4.22, "serif", 104, color=CREAM)]]),
     (5.72, 7.82, [[T("Мешіттің", 5.72, size=62, w=900)], [T("бейнесімен бейнеленген", 6.50, "serif", 84, color=CREAM)]]),
     (7.84, 10.30, [[T("5 түрлі түсте", 7.84, size=70, w=900)], [T("жайнамаз", 9.18, "serif", 100, color=LIME)]]),
     (10.46, 11.92, [[T("Қызыл десеңіз —", 10.46, size=56, w=800)], [T("қызыл түсі,", 11.38, "serif", 96, color=CREAM)]]),
-    (12.02, 12.64, [[T("сары,", 12.02, size=92, w=900)]]),
+    (12.02, 12.64, [[T("жасыл,", 12.02, size=92, w=900)]]),
     (12.68, 13.40, [[T("розовый,", 12.68, size=92, w=900)]]),
     (13.42, 14.50, [[T("көгілдір,", 13.42, size=92, w=900)]]),
     (14.52, 15.38, [[T("көмір түсімен.", 14.52, "serif", 104, color=CREAM)]]),
@@ -90,7 +90,7 @@ CAPS = [
     (17.14, 19.82, [[T("Бұл жайнамаздар", 17.14, size=56, w=800)], [T("тоғыз мыңнан", 18.56, "serif", 96, color=CREAM)], [T("сатылған,", 19.28, size=56, w=800)]]),
     (19.84, 22.82, [[T("қазір де", 19.84, size=56, w=800)], [T("жеңілдікпен", 21.10, "serif", 100, color=LIME)], [T("бар болғаны", 21.84, size=56, w=800)]]),
     (22.84, 24.90, [[T("6 мың теңгеге", 22.84, size=78, w=900)], [T("алып кетесіз,", 23.80, "serif", 92, color=CREAM)]]),
-    (24.92, 26.44, [[T("он данасы —", 24.92, "serif", 92, color=CREAM)], [T("6 000 теңге.", 25.58, size=82, w=900)]]),
+    (24.92, 26.44, [[T("он данасы —", 24.92, "serif", 92, color=CREAM)], [T("60 000 теңге.", 25.58, size=82, w=900)]]),
     (27.26, 29.14, [[T("Ойланбай", 27.26, size=74, w=900)], [T("алып алыңыз,", 27.80, "serif", 96, color=CREAM)]]),
     (29.16, 31.20, [[T("сапасы —", 29.16, size=62, w=800)], [T("енді сөз жоқ.", 30.22, "serif", 104, color=LIME)]]),
 ]
@@ -124,7 +124,7 @@ def word(text, kind, size, w, color):
         out = Image.new("RGBA", im.size, (0, 0, 0, 0)); out.alpha_composite(sh, (0, 5)); out.alpha_composite(im)
         return out
     return spr(("w", text, kind, size, w, color), mk)
-def captions(fr, te, yc=1480):
+def captions(fr, te, yc=1390):
     for a, b, lines in CAPS:
         if not (a - .02 <= te < b + .18): continue
         out = 1 - eio((te - b) / .18) if te > b else 1
@@ -164,7 +164,7 @@ def thumb(i):
         card.paste(im.convert("RGBA"), (0, 0), m)
         THUMBS[i] = Spr(N.shadow(N.pad(card, 24), 16, 170, (0, 8)))
     return THUMBS[i]
-SW = {"қызыл": (196, 36, 48), "сары": (205, 162, 60), "розовый": (200, 160, 150), "көгілдір": (150, 168, 185), "көмір": (35, 35, 38)}
+SW = {"қызыл": (196, 36, 48), "жасыл": (46, 140, 80), "розовый": (200, 160, 150), "көгілдір": (150, 168, 185), "көмір": (35, 35, 38)}
 def dot(name, active):
     def mk():
         im = Image.new("RGBA", (110, 110), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
@@ -210,6 +210,12 @@ def collage(fr, te, a0=7.84, a1=10.40):
          .85 + .15 * back((te - a0 - .7) / .4), out * clamp((te - a0 - .7) / .15))
 
 def motion(fr, te):
+    # HOOK (growth rule #1): on screen from the very first frames
+    a = fadeio(te, 0.0, 2.15, fin=.08)
+    if a:
+        blit(fr, spr("hk0", lambda: N.label("мешіт бейнелі", 50)), W / 2, 470, 1, a)
+        blit(fr, spr("hk1", lambda: N.headline("жайнамаз", size=140)), W / 2, 640, .9 + .1 * back(te / .35), a)
+        blit(fr, spr("hk2", lambda: N.tag("6 000 ₸ · 5 ТҮС", size=52)), W / 2, 830, back((te - .25) / .35), a * clamp((te - .25) / .12))
     # "әдемілігі" — framed neon headline
     a = fadeio(te, 2.30, 4.55)
     if a: blit(fr, spr("h1", lambda: N.headline("әдемілігі", label="көздің жауын алады", size=120)), W / 2, 560,
@@ -221,18 +227,18 @@ def motion(fr, te):
         ln(fr, (c[0] + 233, c[1] - 233), (c[0] + 330, c[1] - 380), eo((te - 6.6) / .35), 4, a)
         if te > 6.9: blit(fr, spr("lb1", lambda: N.label("мешіт бейнесі", 44)), c[0] + 300, c[1] - 430, 1, a * clamp((te - 6.9) / .2))
     # colour dots + active colour name
-    names = [("қызыл", 10.46), ("сары", 12.02), ("розовый", 12.68), ("көгілдір", 13.42), ("көмір", 14.52)]
+    names = [("қызыл", 10.46), ("жасыл", 12.02), ("розовый", 12.68), ("көгілдір", 13.42), ("көмір", 14.52)]
     a = fadeio(te, 10.46, 15.35)
     if a:
-        blit(fr, spr("lbc", lambda: N.label("түстері", 46)), W / 2, 200, 1, a)
+        blit(fr, spr("lbc", lambda: N.label("түстері", 46)), W / 2, 260, 1, a)
         for j, (nm, t0) in enumerate(names):
             d = te - t0
             if d < 0: continue
             nxt = names[j + 1][1] if j + 1 < len(names) else 15.4
             active = t0 <= te < nxt
-            blit(fr, dot(nm, active), W / 2 + (j - 2) * 120, 310, (1.12 if active else 1) * (.6 + .4 * back(d / .35)), a * clamp(d / .15))
+            blit(fr, dot(nm, active), W / 2 + (j - 2) * 120, 360, (1.12 if active else 1) * (.6 + .4 * back(d / .35)), a * clamp(d / .15))
             if active:
-                blit(fr, spr(("ct", nm), lambda nm=nm: N.tag(nm.upper(), size=44)), W / 2, 430, back(d / .3), a)
+                blit(fr, spr(("ct", nm), lambda nm=nm: N.tag(nm.upper(), size=44)), W / 2, 480, back(d / .3), a)
     # quality ✓
     for t0, t1 in ((16.20, 17.12), (30.10, 31.20)):
         a = fadeio(te, t0, t1)
@@ -254,20 +260,24 @@ def motion(fr, te):
         v = int(round((9000 + (6000 - 9000) * p) / 100) * 100); txt = f"{v:,}".replace(",", " ") + " ₸"
         blit(fr, spr(("w6", txt), lambda: N.wallet_card("бар болғаны", "KZT", txt, cross=False)), W / 2,
              560 + 60 * (1 - eo((te - 22.84) / .45)), .96 + .04 * eo((te - 22.84) / .45), a)
+        if te >= 23.2:
+            blit(fr, spr("one", lambda: N.tag("1 ДАНА", size=54)), W / 2, 820, back((te - 23.2) / .35), a)
         if te >= 24.92:
-            blit(fr, spr("ten", lambda: N.tag("10 ДАНА", size=58)), W / 2, 820, back((te - 24.92) / .35), a)
+            blit(fr, spr("ten", lambda: N.tag("10 ДАНА — 60 000 ₸", size=54)), W / 2, 930, back((te - 24.92) / .35), a)
     # "ойланбай" — framed headline with accent
     a = fadeio(te, 27.26, 29.10)
     if a: blit(fr, spr("h8", lambda: N.headline("ойланбай", accent="!", size=130)), W / 2, 620, .85 + .15 * back((te - 27.26) / .38), a)
-    # end card (dark interlude, neon)
+    # end card (dark interlude, neon) + follow CTA
     if te >= 31.25:
         d = te - 31.25
         k = eio(d / .45)
         fr[:] = fr * (1 - k) + N.interlude_bg(W, H, te) * k
-        blit(fr, spr("e0", lambda: N.label("мешіт бейнелі жайнамаз", 46)), W / 2, 600, 1, clamp(d / .2))
-        blit(fr, spr("e1", lambda: N.big_text("6 000 ₸", 210, N.LIME, edge=False)), W / 2, 780, .9 + .1 * back(d / .4), clamp(d / .15))
-        blit(fr, spr("e2", lambda: N.tag("10 ДАНА", size=58)), W / 2, 960, back((d - .25) / .35), clamp((d - .25) / .15))
-        blit(fr, spr("e3", lambda: N.label("5 түрлі түс", 44)), W / 2, 1080, 1, clamp((d - .45) / .2))
+        blit(fr, spr("e0", lambda: N.label("мешіт бейнелі жайнамаз", 46)), W / 2, 420, 1, clamp(d / .2))
+        blit(fr, spr("e1", lambda: N.big_text("6 000 ₸", 190, N.LIME, edge=False)), W / 2, 580, .9 + .1 * back(d / .4), clamp(d / .15))
+        blit(fr, spr("e2", lambda: N.tag("1 ДАНА", size=54)), W / 2, 740, back((d - .2) / .35), clamp((d - .2) / .12))
+        blit(fr, spr("e3", lambda: N.big_text("60 000 ₸", 120, (255, 255, 255), edge=False)), W / 2, 880, .9 + .1 * back((d - .35) / .4), clamp((d - .35) / .15))
+        blit(fr, spr("e4", lambda: N.tag("10 ДАНА", size=50)), W / 2, 1000, back((d - .5) / .35), clamp((d - .5) / .12))
+        blit(fr, spr("cta", lambda: N.follow_cta()), W / 2, 1230, .96 + .04 * eo((d - .6) / .4), clamp((d - .6) / .15))
 
 # ------------------------------------------------------------------ render
 def main(out):
