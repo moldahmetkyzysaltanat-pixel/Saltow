@@ -274,3 +274,20 @@ def interlude_bg(W, H, t=0.0):
         s = int(rng.uniform(9, 15))
         fr[int(y):int(y) + s, int(x):int(x) + s] = np.array(LIME[::-1], np.float32)
     return fr
+
+
+def follow_cta(handle="@zamzam_muslim_products", line="Жазылыңыз", sub="жаңа жайнамаздар · жеңілдіктер"):
+    """End-of-video subscribe CTA: avatar ring + handle + lime 'follow' button (growth rule #6)."""
+    fh = font(XBOLD, 46); fs = font(SEMI, 32); fb = font(BLACK, 46)
+    w = int(max(560, fh.getlength(handle) + 220)); h = 330
+    im = Image.new("RGBA", (w + 80, h + 80), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
+    d.rounded_rectangle([40, 40, 40 + w, 40 + h], radius=40, fill=CARD + (245,), outline=BORDER, width=2)
+    ig = _instagram(120)
+    d.ellipse([62, 62, 202, 202], outline=LIME, width=5)
+    im.alpha_composite(ig, (72, 72))
+    d.text((228, 92), handle, font=fh, fill=WHITE)
+    d.text((228, 152), sub, font=fs, fill=GREY)
+    bw = w - 60; bx0 = 70; by0 = 40 + h - 120
+    d.rounded_rectangle([bx0, by0, bx0 + bw, by0 + 90], radius=26, fill=LIME)
+    d.text((bx0 + bw / 2, by0 + 45), line.upper() + "  +", font=fb, fill=BG, anchor="mm")
+    return shadow(glow(im, radius=18, strength=0.45), 24, 170)
