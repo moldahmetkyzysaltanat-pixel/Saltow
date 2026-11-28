@@ -9,6 +9,15 @@ subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", "voice_raw.wav", "-af",
     "equalizer=f=3000:t=q:w=0.9:g=5,highshelf=f=6000:g=4,acompressor=threshold=-24dB:ratio=2.5:attack=5:release=150:makeup=2",
     "-ar", str(SR), "-ac", "1", "voice_clear.wav"], check=True)
 v = A.read_wav("voice_clear.wav")                   # full voiceover, no cuts
+# remove audible breaths between sentences (timing unchanged, words untouched)
+BREATHS = [(5.06, 5.47), (11.55, 11.76), (16.86, 17.21), (18.83, 19.21), (21.44, 21.80)]
+env = np.ones(len(v), np.float32); fd = int(.025 * SR)
+for a, b in BREATHS:
+    i0, i1 = int(a * SR), int(b * SR)
+    env[i0:i1] = 10 ** (-32 / 20)
+    env[i0 - fd:i0] = np.minimum(env[i0 - fd:i0], np.linspace(1, 10 ** (-32 / 20), fd))
+    env[i1:i1 + fd] = np.minimum(env[i1:i1 + fd], np.linspace(10 ** (-32 / 20), 1, fd))
+v = v * env
 N = len(v)
 m = A.synth_music(N, seed=21, bpm=96)
 m[:SR] *= np.linspace(0, 1, SR); m[-int(1.2 * SR):] *= np.linspace(1, 0, int(1.2 * SR))
